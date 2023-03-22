@@ -1,13 +1,51 @@
 <?php
 $errors = [];
+require 'sellerData.php';
 
 // TODO 3 - Get the data from the form and check for errors
 
+
+foreach($_POST as $key => $value) {
+    $contact[$key] = trim($value);
+}
+
+// $contact = array_map('trim', $_POST);
+
+if(empty($contact['companyName'])) {
+    $errors[] = 'Le nom de la compagnie est obligatoire';
+}
+if(empty($contact['contactName'])) {
+    $errors[] = 'Le nom du contact est obligatoire';
+}
+$contactNameLength = 8;
+if(strlen($contact['contactName']) > $contactNameLength) {
+    $errors[] = 'Le nom de contact doit faire moins de ' . $contactNameLength . ' caractères';
+}
+
+if(empty($contact['contactEmail'])) {
+    $errors[] = 'L\'email du contact est obligatoire';
+}
+if(!filter_var($contact['contactEmail'], FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'L\'email du contact a un format incorrect';
+}
+if(empty($contact['contactMessage'])) {
+    $errors[] = 'Le message est obligatoire';
+}
+
+$contactMessageLength = 10;
+if(strlen($contact['contactMessage']) < $contactMessageLength) {
+    $errors[] = 'Le message doit faire plus de ' . $contactMessageLength . ' caractères';
+}
+
+if(!key_exists($contact['image'],  $sellers )) {
+    $errors[] = 'Le nom selectionné est incorrect';
+}
 
 if (!empty($errors)) {
     require 'error.php';
     die();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -32,23 +70,18 @@ if (!empty($errors)) {
         <div class="summary">
             <!-- BONUS -->
             <p>
-                <img src="images/placeholder.png" alt="">
+                <img src="images/<?= $contact['image'] ?>.webp" alt="">
                 <span>Votre vendeur</span>
             </p>
             
 
             <!-- TODO 2 - Replace those placeholders by the values sent from the form -->
             <ul>
-                <li>Votre entreprise : <span>Dunder Mifflin</span></li>
-                <li>Votre nom : <span>Mickael Scott</span></li>
-                <li>Votre email : <span>mickael.scott@dundermifflin.com</span></li>
+                <li>Votre entreprise : <span><?= htmlentities($contact['companyName']) ?></span></li>
+                <li>Votre nom : <span><?= htmlentities($contact['contactName']) ?></span></li>
+                <li>Votre email : <span><?= htmlentities($contact['contactEmail']) ?></span></li>
                 <li>Votre message :
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Provident facere, tempora possimus aspernatur excepturi
-                        incidunt dolores illo dicta similique harum mollitia enim
-                        voluptates delectus? Repellendus inventore molestiae a
-                        accusamus deleniti?
-                    </p>
+                    <p><?= nl2br(htmlentities($contact['contactMessage'])) ?></p>
                 </li>
             </ul>
         </div>
